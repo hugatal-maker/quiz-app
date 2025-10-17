@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מאמן חידון בסטטיסטיקה</title>
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <main class="app">
+    <section id="welcome-screen" class="card">
+      <h1>מאמן חידון בסטטיסטיקה</h1>
+      <p>לטש את כישורי הבחינה שלך עם שאלות תרגול נבחרות ועקוב אחר ההתקדמות לאורך הדרך.</p>
+      <button id="start-btn" class="primary-action">התחל לתרגל</button>
+    </section>
+
+    <section id="quiz-screen" class="card hidden">
+      <header class="quiz-header">
+        <div class="progress">
+          <div id="progress-text">שאלה 1 מתוך 8</div>
+          <div class="progress-bar">
+            <span id="progress-bar-fill"></span>
+          </div>
+        </div>
+        <div class="scoreboard">
+          <div class="scoreboard-item">
+            <span class="label">תשובות נכונות</span>
+            <span id="correct-count" class="value">0</span>
+          </div>
+          <div class="scoreboard-item">
+            <span class="label">רצף נוכחי</span>
+            <span id="streak-count" class="value">0</span>
+          </div>
+          <div class="scoreboard-item">
+            <span class="label">רצף שיא</span>
+            <span id="best-streak-count" class="value">0</span>
+          </div>
+        </div>
+      </header>
+
+      <article id="question-meta">
+        <span id="difficulty-badge" class="difficulty-badge">רמת קושי</span>
+        <h2 id="question-text"></h2>
+      </article>
+
+      <div id="options-container" class="options"></div>
+
+      <div id="feedback" class="feedback">
+        <p id="feedback-message"></p>
+        <p id="feedback-explanation" class="feedback-explanation"></p>
+      </div>
+
+      <div class="action-buttons">
+        <button id="next-btn" class="primary-action" disabled>לשאלה הבאה</button>
+        <button id="replace-btn" class="secondary-action">החלף שאלה</button>
+        <button id="skip-btn" class="ghost-action">דלג</button>
+      </div>
+    </section>
+
+    <section id="results-screen" class="card hidden">
+      <h2>סיכום ההפעלה</h2>
+      <p id="summary-statement"></p>
+      <ul class="summary-list">
+        <li><strong>מספר השאלות:</strong> <span id="summary-total"></span></li>
+        <li><strong>תשובות נכונות:</strong> <span id="summary-correct"></span></li>
+        <li><strong>שאלות שדולגו:</strong> <span id="summary-skipped"></span></li>
+        <li><strong>שאלות שהוחלפו:</strong> <span id="summary-replaced"></span></li>
+        <li><strong>רצף שיא:</strong> <span id="summary-best-streak"></span></li>
+      </ul>
+      <button id="restart-btn" class="primary-action">התחל מחדש</button>
+    </section>
+  </main>
+
+  <script type="module" src="./scripts/main.js"></script>
+</body>
+</html>
