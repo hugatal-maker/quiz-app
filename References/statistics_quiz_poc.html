@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>גישות מחקר וסטטיסטיקה</title>
+    <!-- טעינת Tailwind CSS לסטיילינג מהיר ורספונסיבי -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- שימוש בגופן Ariel כברירת מחדל -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background-color: #e6f0ff; /* רקע כחול בהיר מאוד */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px; /* ריווח מוגבר */
+            border-radius: 20px; /* פינות עגולות במיוחד */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); /* צללית עמוקה ודרמטית */
+            max-width: 800px; /* רוחב מוגדל מעט */
+            width: 100%;
+            margin-top: 30px;
+            border: 1px solid #c3d7f7;
+        }
+
+        /* סגנונות מסך הפתיחה המושך */
+        #welcome-screen {
+            text-align: center;
+            padding: 50px 30px;
+            background: linear-gradient(135deg, #f0f8ff 0%, #d4e7ff 100%); /* גרדיאנט כחול-לבן עדין */
+            border-radius: 16px;
+            border: 3px solid #3b82f6;
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+        }
+        #welcome-screen h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #1e40af; /* כחול עמוק */
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        #welcome-screen p {
+            font-size: 1.2rem;
+            color: #4b5563;
+            margin-bottom: 40px;
+        }
+        .start-button {
+            background-color: #10b981; /* ירוק בולט */
+            color: white;
+            padding: 18px 40px;
+            border-radius: 9999px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* אפקט קפיצה דינמי */
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.5);
+        }
+        .start-button:hover {
+            background-color: #059669;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(16, 185, 129, 0.7);
+        }
+
+        /* סגנונות כלליים לחידון */
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        /* סגנון כללי לתג קושי */
+        .difficulty-text {
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 10px;
+            border: 1px solid;
+            display: inline-block; /* חשוב לשמירה על הרווח */
+            margin-bottom: 15px; /* רווח תחתון מהשאלה */
+        }
+        /* צביעת קושי דינמית */
+        .difficulty-easy {
+            background-color: #d1fae5; /* Light Green */
+            color: #059669; /* Dark Green */
+            border-color: #38a169;
+        }
+        .difficulty-medium {
+            background-color: #fffbeb; /* Light Yellow */
+            color: #d97706; /* Dark Orange/Yellow */
+            border-color: #f6ad55;
+        }
+        .difficulty-hard {
+            background-color: #fee2e2; /* Light Red */
+            color: #b91c1c; /* Dark Red */
+            border-color: #ef4444;
+        }
+        .difficulty-very-hard {
+            background-color: #f3e5e9; /* Light Burgundy/Pink */
+            color: #831843; /* Deep Burgundy/Maroon */
+            border-color: #be185d;
+        }
+
+        /* שיפור ויזואלי לכפתורי התשובה */
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 18px 28px;
+            margin-bottom: 18px;
+            background-color: #f8faff; /* לבן-כחלחל עדין */
+            color: #2c5282;
+            border: 1px solid #c3d7f7;
+            border-radius: 12px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease-in-out;
+        }
+        .option-button:hover:not(.correct):not(.incorrect):not(:disabled) {
+            background-color: #eef5ff;
+            border-color: #4299e1;
+            transform: translateX(3px); /* אפקט קריאה לימין */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .option-button.correct {
+            background-color: #d4edda; /* ירוק בהיר מאוד */
+            color: #1f7a29; 
+            border-color: #38a169;
+            box-shadow: 0 0 15px rgba(56, 161, 105, 0.6);
+        }
+        .option-button.incorrect {
+            background-color: #fde8e8; /* אדום בהיר מאוד */
+            color: #9b2c2c;
+            border-color: #e53e3e;
+            box-shadow: 0 0 15px rgba(227, 52, 47, 0.6);
+        }
+        
+        /* כפתורי פעולה - בולטים וצבעוניים */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .action-buttons button {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* כפתור הבא - ירוק מנצח */
+        .next-button {
+            background-color: #10b981; 
+            color: white;
+        }
+        .next-button:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+        
+        /* כפתור החלף שאלה - כחול פעולה */
+        .replace-button {
+            background-color: #3b82f6; 
+            color: white;
+        }
+        .replace-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        /* כפתור דלג - אפור פונקציונלי */
+        .skip-button {
+            background-color: #9ca3af; 
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .skip-button:hover {
+            background-color: #6b7280;
+            transform: translateY(-1px);
+        }
+
+        /* מד הרצף - במיקום בולט מתחת להתקדמות */
+        .progress-and-streak {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .progress-text {
+            flex-grow: 1;
+            text-align: right;
+            margin-left: 15px;
+        }
+        .streak-meter {
+            background-color: #f7f3ff;
+            border: 2px solid #a78bfa;
+            color: #6d28d9;
+            padding: 8px 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* מד למידה (מיקום מתוקן) */
+        .learning-meter-container {
+            margin-top: 5px;
+            margin-bottom: 25px;
+        }
+        
+        /* סגנונות מסך הסיום המעודדים */
+        .results-box {
+            text-align: center;
+            padding: 40px 30px;
+            background: linear-gradient(145deg, #f0fff4 0%, #ccfbf1 100%); 
+            border: 3px solid #10b981;
+            border-radius: 20px;
+            color: #065f46;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        .results-box h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #059669;
+        }
+        #verbal-assessment {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: #e0f2fe;
+            color: #1e40af;
+        }
+        .restart-button {
+            background-color: #3b82f6; /* כחול בולט לכפתור חדש */
+            color: white;
+            padding: 16px 35px;
+            border-radius: 9999px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+        }
+        .restart-button:hover {
+            background-color: #2563eb;
+        }
+
+        /* סגנונות קופץ בונוס */
+        .streak-bonus-popup {
+            background-color: #fbbf24; /* צהוב בוהק */
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- מסך פתיחה -->
+        <div id="welcome-screen">
+            <h1>גישות מחקר וסטטיסטיקה במדע המדינה וביחב"ל</h1>
+            <p>התחל/י את התרגול הממוקד שלך לקראת המבחן. כל מבחן כולל 20 שאלות אקראיות מתוך מאגר מקיף של נושאי הקורס.  בהצלחה!</p>
+            <button class="start-button" id="start-quiz-button">התחל/י מבחן</button>
+        </div>
+
+        <!-- מסך חידון (מוסתר בהתחלה) -->
+        <div id="quiz-screen" class="hidden">
+            <div class="progress-and-streak">
+                <p class="progress-text" id="progress-display">שאלה 1 מתוך 20</p>
+                <!-- מד רצף -->
+                <div class="streak-meter" id="streak-meter">
+                    <span class="streak-icon">🔥</span> רצף: <span id="current-streak">0</span>
+                </div>
+            </div>
+            
+            <!-- מד למידה -->
+            <div class="learning-meter-container">
+                <div class="learning-meter-fill" id="learning-meter-fill" style="width: 0%;"></div>
+            </div>
+            <p class="learning-meter-text" id="learning-meter-text">מד למידה: 0%</p>
+
+            <!-- מיקום חדש לתג הקושי -->
+            <span class="difficulty-text mb-4" id="difficulty-display"></span>
+            
+            <div class="question-text" id="question-display"></div>
+            
+            <div id="options-container">
+                <!-- כפתורי התשובות יוצגו כאן -->
+            </div>
+            <div class="feedback-box hidden" id="feedback-display">
+                <!-- משוב והסבר יוצגו כאן -->
+            </div>
+            <div class="action-buttons">
+                <button class="next-button hidden" id="next-button">הבא</button>
+                <button class="skip-button" id="skip-button">דלג</button>
+                <button class="replace-button" id="replace-button">החלף שאלה</button>
+            </div>
+        </div>
+
+        <!-- מסך תוצאות (מוסתר בהתחלה) -->
+        <div id="results-screen" class="hidden">
+            <div class="results-box">
+                <h2 id="results-title">סיום המבחן</h2>
+                <p id="final-score"></p>
+                <div id="verbal-assessment"></div>
+                <p class="learning-meter-text mt-4" id="final-learning-meter-text"></p>
+                <button class="restart-button" id="restart-button">מבחן חדש</button>
+            </div>
+        </div>
+    </div>
+    <div id="bonus-popup-container"></div>
+
+    <script>
+        // מערך השאלות המלא - 65 שאלות מגוונות ומקיפות.
+        const allQuestions = [
+            // שיעור 1: מבוא ומושגי יסוד
+            { id: 'q1_1', question: "מהו ההבדל העיקרי בין סטטיסטיקה תיאורית לסטטיסטיקה היסקית", options: ["סטטיסטיקה תיאורית מתארת נתונים, היסקית מסיקה מסקנות על אוכלוסייה", "סטטיסטיקה תיאורית עוסקת רק במשתנים איכותיים, היסקית רק בכמותיים", "סטטיסטיקה תיאורית דורשת מדגם גדול, היסקית יכולה להסתפק במדגם קטן", "אין הבדל מהותי, אלו רק שמות שונים לאותו תחום"], correctAnswer: 0, explanation: "סטטיסטיקה תיאורית עוסקת בסיכום, ארגון והצגת נתונים (למשל, ממוצע, חציון, גרפים). סטטיסטיקה היסקית משתמשת בנתוני מדגם כדי להסיק מסקנות, להכליל ולבצע הערכות לגבי אוכלוסייה גדולה יותר", topic: "מבוא", difficulty: "קל" },
+            { id: 'q1_2', question: "איזה מבין המושגים הבאים מתאר את כלל הפרטים שאותם אנו רוצים לחקור", options: ["מדגם", "משתנה", "אוכלוסייה", "קבוע"], correctAnswer: 2, explanation: "אוכלוסייה היא כלל הפרטים (אנשים, אובייקטים, אירועים) שאותם החוקר מעוניין לחקור ולהסיק לגביהם מסקנות. מדגם הוא תת-קבוצה של האוכלוסייה", topic: "מבוא", difficulty: "קל" },
+            { id: 'q1_3', question: "מהי יחידת הניתוח הבסיסית ביותר בסטטיסטיקה", options: ["מדגם", "תצפית", "משתנה", "אוכלוסייה"], correctAnswer: 1, explanation: "תצפית (Observation) היא הערך הבודד של משתנה עבור יחידת ניתוח מסוימת", topic: "מבוא", difficulty: "קל" },
+            { id: 'q1_4', question: "מהו 'קבוע' בהקשר סטטיסטי", options: ["ערך המשתנה שמשתנה ממדידה למדידה", "מאפיין שאינו משתנה בין פרטים באוכלוסייה או במדגם", "מדד מרכז יציב", "טעות מדידה קבועה"], correctAnswer: 1, explanation: "קבוע הוא מאפיין או תכונה שאינם משתנים בין הפרטים הנחקרים, בניגוד למשתנה שערכיו משתנים", topic: "מבוא", difficulty: "קל" },
+            { id: 'q1_5', question: "מהי מטרת הסטטיסטיקה בתהליך המחקרי", options: ["לנסח השערות מחקר", "לאסוף נתונים באופן שיטתי", "לנתח נתונים ולהסיק מהם מסקנות לגבי האוכלוסייה", "להציג את מסקנות המחקר לקהל הרחב"], correctAnswer: 2, explanation: "הסטטיסטיקה משמשת ככלי לניתוח נתונים שנאספו במחקר, על מנת לסכם אותם ולהסיק מהם מסקנות תקפות לגבי האוכלוסייה ממנה נלקח המדגם", topic: "מבוא", difficulty: "בינוני" },
+
+            // שיעור 2: הצגת נתונים ורמות מדידה
+            { id: 'q2_1', question: "מהי רמת המדידה של משתנה 'צבע עיניים' (כחול, חום, ירוק)", options: ["שמי (נומינלי)", "סדר (אורדינלי)", "רווח (אינטרוולי)", "מנה (רציונלי)"], correctAnswer: 0, explanation: "רמת מדידה שמית (נומינלית) משמשת לסיווג קטגוריות ללא סדר או דירוג טבעי ביניהן. צבעי עיניים הם דוגמה מצוינת לכך", topic: "הצגת נתונים", difficulty: "קל" },
+            { id: 'q2_2', question: "באיזה סוג גרף נשתמש כדי להציג את התפלגות הציונים בקורס (מ-0 עד 100)", options: ["גרף עוגה", "גרף עמודות", "היסטוגרמה", "דיאגרמת פיזור"], correctAnswer: 2, explanation: "היסטוגרמה מתאימה להצגת התפלגות של משתנה כמותי רציף או בדיד עם קטגוריות רבות (כמו ציונים), כאשר הציר האופקי מייצג טווחי ערכים והגובה מייצג את השכיחות בכל טווח", topic: "הצגת נתונים", difficulty: "בינוני" },
+            { id: 'q2_3', question: "מהי רמת המדידה של משתנה 'דירוג שביעות רצון' (נמוך, בינוני, גבוה)", options: ["שמי", "סדר", "רווח", "מנה"], correctAnswer: 1, explanation: "רמת מדידה סדר (אורדינלית) מאפשרת לסדר את הקטגוריות לפי סדר הגיוני, אך ללא מרווחים שווים בין הערכים", topic: "הצגת נתונים", difficulty: "קל" },
+            { id: 'q2_4', question: "איזה סוג של התפלגות מתארת מצב שבו רוב התצפיות מרוכזות בצד ימין של הגרף, עם 'זנב' ארוך לצד שמאל", options: ["התפלגות סימטרית", "התפלגות א-סימטרית חיובית", "התפלגות א-סימטרית שלילית", "התפלגות נורמלית"], correctAnswer: 2, explanation: "התפלגות א-סימטרית שלילית (Skewed Left) מתאפיינת בריכוז נתונים גבוהים וזנב ארוך לכיוון הערכים הנמוכים (שמאל)", topic: "הצגת נתונים", difficulty: "בינוני" },
+            { id: 'q2_5', question: "מהי טבלת שכיחויות מצטברת", options: ["טבלה המציגה את מספר הפעמים שכל ערך מופיע", "טבלה המציגה את האחוז היחסי של כל ערך", "טבלה המציגה את סך השכיחויות עד לערך מסוים כולל", "טבלה המציגה רק את הערכים הנפוצים ביותר"], correctAnswer: 2, explanation: "שכיחות מצטברת היא סכום השכיחויות של כל הערכים הנמוכים או שווים לערך מסוים", topic: "הצגת נתונים", difficulty: "בינוני" },
+            { id: 'q2_6', question: "משתנה 'מספר ילדים במשפחה' הוא דוגמה למשתנה", options: ["איכותי שמי", "איכותי סדר", "כמותי בדיד", "כמותי רציף"], correctAnswer: 2, explanation: "משתנה כמותי בדיד הוא משתנה שערכיו הם מספרים שלמים וניתנים לספירה (למשל, מספר ילדים, מספר מכוניות)", topic: "הצגת נתונים", difficulty: "קל" },
+            { id: 'q2_7', question: "איזו רמת מדידה מכילה אפס מוחלט (היעדר מוחלט של התכונה הנמדדת)", options: ["סדר", "רווח", "מנה", "פסאודו רווח"], correctAnswer: 2, explanation: "רמת מנה (Ratio) היא רמת המדידה היחידה שיש בה משמעות ל'אפס מוחלט', המאפשרת יחסים בין ערכים (למשל, משקל, גובה, גיל)", topic: "הצגת נתונים", difficulty: "קשה" },
+
+            // שיעור 3: מדדי מרכז ופיזור
+            { id: 'q3_1', question: "בסדרת הנתונים: 5, 8, 10, 12, 15, מהו החציון", options: ["5", "10", "12", "15"], correctAnswer: 1, explanation: "החציון הוא הערך האמצעי בסדרת נתונים מסודרת. בסדרה 5, 8, 10, 12, 15, הערך האמצעי הוא 10", topic: "מדדי מרכז ופיזור", difficulty: "קל" },
+            { id: 'q3_2', question: "איזה מדד פיזור מושפע בצורה הקיצונית ביותר על ידי ערכי קיצון (Outliers)", options: ["טווח", "שונות", "סטיית תקן", "פרופורציה"], correctAnswer: 0, explanation: "הטווח (הפרש בין הערך המקסימלי למינימלי) מושפע באופן ישיר ומשמעותי מכל ערך קיצוני", topic: "מדדי מרכז ופיזור", difficulty: "בינוני" },
+            { id: 'q3_3', question: "באיזו התפלגות הממוצע, החציון והשכיח נוטים להיות זהים", options: ["התפלגות א-סימטרית חיובית", "התפלגות א-סימטרית שלילית", "התפלגות נורמלית (סימטרית)", "התפלגות דו-שכיחית"], correctAnswer: 2, explanation: "בהתפלגות סימטרית (כמו ההתפלגות הנורמלית), הממוצע, החציון והשכיח מתלכדים בנקודה אחת במרכז ההתפלגות", topic: "מדדי מרכז ופיזור", difficulty: "קל" },
+            { id: 'q3_4', question: "מהי שונות (Variance)", options: ["השורש הריבועי של סטיית התקן", "מדד לפיזור הממוצע של הריבועים של סטיות מהממוצע", "ההפרש בין הערך הגבוה לנמוך ביותר", "מדד המרכז של הנתונים"], correctAnswer: 1, explanation: "שונות היא מדד לפיזור הממוצע של ריבועי הסטיות של כל תצפית מהממוצע. היא מודדת את הפיזור הממוצע של הנתונים סביב הממוצע", topic: "מדדי מרכז ופיזור", difficulty: "קשה" },
+            { id: 'q3_5', question: "מהי פרופורציה", options: ["מספר התצפיות בקטגוריה מסוימת", "החלק היחסי של קטגוריה מסוימת מתוך הסך הכל", "מדד מרכז למשתנים כמותיים", "מדד פיזור למשתנים איכותיים"], correctAnswer: 1, explanation: "פרופורציה היא החלק היחסי של חלק מסוים מתוך השלם, ומחושבת כמספר התצפיות בקטגוריה חלקי סך כל התצפיות", topic: "מדדי מרכז ופיזור", difficulty: "קל" },
+            { id: 'q3_6', question: "מהו השכיח (Mode) בסדרת הנתונים: 2, 3, 3, 4, 5, 5, 5, 6", options: ["3", "4", "5", "3 ו-5"], correctAnswer: 2, explanation: "השכיח הוא הערך המופיע במספר הפעמים הרב ביותר בסדרת נתונים. במקרה זה, 5 מופיע 3 פעמים", topic: "מדדי מרכז ופיזור", difficulty: "קל" },
+            { id: 'q3_7', question: "איזה מדד מרכז הוא היחיד שניתן לחשב עבור משתנה ברמת מדידה שמית", options: ["ממוצע", "חציון", "שכיח", "כל התשובות נכונות"], correctAnswer: 2, explanation: "השכיח הוא מדד המרכז היחיד שניתן לחשב עבור משתנים שמייים, מכיוון שהוא מתאר את הקטגוריה הנפוצה ביותר ואינו דורש סדר או מרווחים בין הערכים", topic: "מדדי מרכז ופיזור", difficulty: "בינוני" },
+            { id: 'q3_8', question: "מה קורה לממוצע ולחציון בהתפלגות א-סימטרית חיובית (זנב ימינה)", options: ["הממוצע גדול מהחציון", "החציון גדול מהממוצע", "הממוצע והחציון שווים", "השכיח גדול מהממוצע"], correctAnswer: 0, explanation: "בהתפלגות א-סימטרית חיובית (מוטה ימינה), ערכי הקיצון הגבוהים 'מושכים' את הממוצע כלפי מעלה יותר מאשר את החציון, ולכן הממוצע גדול מהחציון", topic: "מדדי מרכז ופיזור", difficulty: "קשה" },
+
+            // שיעור 4: מדדי מיקום יחסי והתפלגות נורמלית
+            { id: 'q4_1', question: "אם ציון תקן (Z-score) של סטודנט הוא 0, מה משמעות הדבר", options: ["הסטודנט קיבל את הציון הגבוה ביותר", "הסטודנט קיבל את הציון הנמוך ביותר", "ציון הסטודנט שווה לממוצע הקבוצה", "ציון הסטודנט נמצא בסטיית תקן אחת מעל הממוצע"], correctAnswer: 2, explanation: "ציון תקן (Z-score) מודד כמה סטיות תקן ציון מסוים רחוק מהממוצע. ציון Z של 0 מציין שהציון הספציפי זהה לממוצע הקבוצה", topic: "התפלגות נורמלית", difficulty: "קל" },
+            { id: 'q4_2', question: "על פי החוק האמפירי (עבור התפלגות נורמלית), איזה אחוז מהתצפיות נופל בטווח של סטיית תקן אחת מעל ומתחת לממוצע", options: ["68%", "95%", "99.7%", "50%"], correctAnswer: 0, explanation: "החוק האמפירי קובע שבהתפלגות נורמלית: כ-68% מהתצפיות נמצאות בטווח של סטיית תקן אחת מהממוצע", topic: "התפלגות נורמלית", difficulty: "בינוני" },
+            { id: 'q4_3', question: "מהו אחוזון 75", options: ["הציון ש-75% מהציונים גבוהים ממנו", "הציון ש-75% מהציונים נמוכים או שווים לו", "הציון הממוצע של 75% מהקבוצה", "הציון הנמוך ביותר ב-75% העליונים"], correctAnswer: 1, explanation: "אחוזון 75 (או הרביעון השלישי) הוא הערך ש-75% מהתצפיות במערך נתונים מסודר נמצאות מתחתיו או שוות לו", topic: "התפלגות נורמלית", difficulty: "בינוני" },
+            { id: 'q4_4', question: "משפט הגבול המרכזי קובע כי התפלגות הדגימה של הממוצעים תהיה נורמלית כאשר", options: ["המדגם קטן מאוד", "סטיית התקן של האוכלוסייה ידועה", "גודל המדגם מספיק גדול (בדרך כלל N>30)", "האוכלוסייה עצמה מתפלגת נורמלית"], correctAnswer: 2, explanation: "משפט הגבול המרכזי קובע שגם אם התפלגות האוכלוסייה אינה נורמלית, התפלגות הדגימה של הממוצעים תתקרב להתפלגות נורמלית ככל שגודל המדגם גדל", topic: "התפלגות נורמלית", difficulty: "קשה" },
+            { id: 'q4_5', question: "מהו החוק האמפירי בהקשר של התפלגות נורמלית", options: ["חוק המספרים הגדולים", "כלל 68-95-99.7", "משפט הגבול המרכזי", "כלל האחוזונים"], correctAnswer: 1, explanation: "החוק האמפירי, הידוע גם ככלל 68-95-99.7, מתאר את אחוז התצפיות הנופלות בטווח של סטיית תקן אחת, שתיים ושלוש מהממוצע בהתפלגות נורמלית", topic: "התפלגות נורמלית", difficulty: "בינוני" },
+            { id: 'q4_6', question: "מהי מטרת הפיכת ציון גלם לציון תקן (Z-score)", options: ["להפוך את הציון לערך חיובי", "להשוות ציונים מתוך התפלגויות שונות", "לחשב את ממוצע הציונים", "לשנות את רמת המדידה של הציון"], correctAnswer: 1, explanation: "ציון תקן מאפשר להבין את מיקומו היחסי של ציון מסוים בתוך התפלגות, ועל ידי כך להשוות ציונים שהגיעו מהתפלגויות שונות בעלות ממוצע וסטיית תקן שונים", topic: "התפלגות נורמלית", difficulty: "בינוני" },
+            { id: 'q4_7', question: "מהו 'חוק המספרים הגדולים'", options: ["ככל שהמדגם גדול יותר, כך הסטטיסטיקה הופכת למובהקת יותר", "ככל שמספר הניסויים גדל, כך ממוצע התוצאות יתקרב לתוחלת האוכלוסייה", "ההסתברות לטעות מסוג I יורדת ככל שהמדגם גדול יותר", "ההסתברות לטעות מסוג II עולה ככל שהמדגם קטן יותר"], correctAnswer: 1, explanation: "חוק המספרים הגדולים קובע שככל שמגדילים את מספר התצפיות או הניסויים, כך ממוצע המדגם נוטה להתקרב יותר ויותר לתוחלת האמיתית של האוכלוסייה", topic: "התפלגות נורמלית", difficulty: "קשה" },
+            { id: 'q4_8', question: "בהתפלגות נורמלית, איזה מדד מרכז שווה לאחוזון ה-50", options: ["הממוצע", "החציון", "השכיח", "כל התשובות נכונות"], correctAnswer: 3, explanation: "בהתפלגות נורמלית, הממוצע, החציון והשכיח שווים, והם כולם מייצגים את אחוזון ה-50 (החציון), שכן הם מחלקים את הנתונים לשני חצאים שווים", topic: "התפלגות נורמלית", difficulty: "קל" },
+
+            // שיעור 5: מסטטיסטיקה תיאורית להיסקית
+            { id: 'q5_1', question: "מהו המטרה העיקרית של בניית רווח בר סמך", options: ["לתאר את מדדי המרכז של המדגם", "להעריך את הפרמטר האמיתי של האוכלוסייה בטווח מסוים של ביטחון", "לבחון קשר בין שני משתנים", "לחשב את סטיית התקן של המדגם"], correctAnswer: 1, explanation: "רווח בר סמך מספק טווח ערכים, אשר בתוכו אנו מצפים למצוא את הפרמטר האמיתי של האוכלוסייה (למשל, ממוצע האוכלוסייה) ברמת ביטחון מסוימת (למשל, 95%)", topic: "סטטיסטיקה היסקית", difficulty: "בינוני" },
+            { id: 'q5_2', question: "מהו 'דגימה' בהקשר של מחקר סטטיסטי", options: ["תהליך איסוף כל הנתונים מהאוכלוסייה כולה", "תהליך בחירת תת-קבוצה של פרטים מתוך האוכלוסייה לצורך מחקר", "חישוב ממוצע הציונים של קבוצת סטודנטים", "הצגת נתונים באמצעות גרפים וטבלאות"], correctAnswer: 1, explanation: "דגימה היא התהליך שבו בוחרים תת-קבוצה (מדגם) של פרטים מתוך אוכלוסייה גדולה יותר, מתוך מטרה לחקור את המדגם ולהסיק ממנו מסקנות לגבי האוכלוסייה כולה", topic: "סטטיסטיקה היסקית", difficulty: "קל" },
+            { id: 'q5_3', question: "מהי טעות תקן של הממוצע", options: ["סטיית התקן של האוכלוסייה", "סטיית התקן של המדגם", "סטיית התקן של התפלגות הדגימה של הממוצעים", "ההפרש בין ממוצע המדגם לממוצע האוכלוסייה"], correctAnswer: 2, explanation: "טעות תקן של הממוצע (Standard Error of the Mean) היא סטיית התקן של התפלגות הדגימה של הממוצעים. היא מודדת את הדיוק של ממוצע המדגם כאומדן לממוצע האוכלוסייה", topic: "סטטיסטיקה היסקית", difficulty: "קשה" },
+            { id: 'q5_4', question: "כאשר אנו בונים רווח בר סמך, מה מייצג רמת הביטחון (Confidence Level)", options: ["ההסתברות שהמדגם שלנו מייצג את האוכלוסייה", "ההסתברות שהפרמטר האמיתי של האוכלוסייה נופל בתוך הרווח שבנינו", "ההסתברות לטעות מסוג I", "ההסתברות לטעות מסוג II"], correctAnswer: 1, explanation: "רמת הביטחון (למשל, 95%) מציינת את אחוז הפעמים שבהן, אם נבנה רווחי סמך רבים ממדגמים שונים, רווח הסמך אכן יכיל את הפרמטר האמיתי של האוכלוסייה", topic: "סטטיסטיקה היסקית", difficulty: "קשה" },
+            { id: 'q5_5', question: "מהי המטרה העיקרית של 'דגימה אקראית פשוטה'", options: ["להבטיח שכל פרט באוכלוסייה ייבחר למדגם", "להבטיח שלכל פרט באוכלוסייה יש סיכוי שווה להיבחר למדגם", "לבחור את הפרטים הנוחים ביותר למחקר", "להקטין את טעות התקן של הממוצע"], correctAnswer: 1, explanation: "דגימה אקראית פשוטה היא שיטת דגימה שבה לכל פרט באוכלוסייה יש סיכוי שווה ובלתי תלוי להיכלל במדגם, מה שמבטיח ייצוגיות טובה יותר של המדגם לאוכלוסייה", topic: "סטטיסטיקה היסקית", difficulty: "בינוני" },
+            { id: 'q5_6', question: "מדוע חשוב לבצע דגימה אקראית במחקר", options: ["כדי להבטיח שהמדגם יהיה קטן ככל האפשר", "כדי להבטיח שנוכל לבחור את הפרטים הנוחים ביותר למחקר", "כדי להגדיל את הסיכוי שהמדגם יהיה ייצוגי לאוכלוסייה", "כדי להקטין את השונות בתוך המדגם"], correctAnswer: 2, explanation: "דגימה אקראית מגדילה את הסיכוי שהמדגם יהיה ייצוגי לאוכלוסייה, ובכך מאפשרת להכליל את הממצאים מהמדגם לאוכלוסייה בביטחון רב יותר", topic: "סטטיסטיקה היסקית", difficulty: "בינוני" },
+
+            // שיעור 6: תהליך בדיקת השערות א'
+            { id: 'q6_1', question: "מהי השערת האפס (H0) בבדיקת השערות", options: ["השערה הטוענת לקיומו של אפקט או הבדל משמעותי", "השערה הטוענת שאין אפקט או הבדל בין קבוצות/משתנים", "השערה שמתאימה רק למבחני T", "השערה שתמיד נדחית במחקר סטטיסטי"], correctAnswer: 1, explanation: "השערת האפס (H0) היא השערה שמרנית המניחה שאין אפקט, אין הבדל, או אין קשר באוכלוסייה. בדיקת ההשערות מנסה להפריך את H0 לטובת השערה אלטרנטיבית", topic: "בדיקת השערות", difficulty: "בינוני" },
+            { id: 'q6_2', question: "מהי 'מובהקות סטטיסטית' (Statistical Significance)", options: ["ההסתברות שהתוצאות שהתקבלו במדגם הן תוצאות מקריות בלבד", "ההסתברות לדחות את השערת האפס כאשר היא נכונה במציאות (טעות מסוג I)", "ההסתברות שהשערת המחקר נכונה", "גודל האפקט שנמצא במחקר"], correctAnswer: 1, explanation: "מובהקות סטטיסטית (רמת אלפא) היא ההסתברות לדחות את השערת האפס כאשר היא למעשה נכונה. רמה מקובלת היא 0.05 (5%), כלומר, סיכוי של 5% לטעות מסוג I", topic: "בדיקת השערות", difficulty: "קשה" },
+            { id: 'q6_3', question: "מהי השערה אלטרנטיבית (H1)", options: ["השערה הטוענת שאין הבדל או אפקט", "השערה הטוענת לקיומו של הבדל או אפקט", "השערה שמתאימה רק למבחן Z", "השערה שתמיד מתקבלת במחקר"], correctAnswer: 1, explanation: "השערה אלטרנטיבית (H1) היא השערת המחקר, הטוענת לקיומו של אפקט, הבדל או קשר באוכלוסייה", topic: "בדיקת השערות", difficulty: "קל" },
+            { id: 'q6_4', question: "מהו 'ערך קריטי' בבדיקת השערות", options: ["הציון הגבוה ביותר במדגם", "הציון הנמוך ביותר במדגם", "הערך של סטטיסטי המבחן שמעבר לו דוחים את השערת האפס", "הערך של סטטיסטי המבחן שמתחתיו מקבלים את השערת האפס"], correctAnswer: 2, explanation: "הערך הקריטי הוא הגבול שנקבע מראש (על בסיס רמת המובהקות) שמפריד בין אזור הדחייה לאזור הקבלה של השערת האפס בהתפלגות הדגימה", topic: "בדיקת השערות", difficulty: "קשה" },
+            { id: 'q6_5', question: "מהו P-value (ערך אלפא מינימלית)", options: ["ההסתברות לקבל את השערת האפס", "ההסתברות שהתוצאות שהתקבלו מקריות, בהנחה שהשערת האפס נכונה", "ההסתברות לטעות מסוג II", "רמת הביטחון של המבחן"], correctAnswer: 1, explanation: "P-value הוא ההסתברות לקבל תוצאה קיצונית כמו זו שהתקבלה במדגם (או קיצונית יותר), בהנחה שהשערת האפס נכונה. אם P-value קטן מרמת המובהקות (אלפא), דוחים את H0", topic: "בדיקת השערות", difficulty: "קשה מאוד" },
+            { id: 'q6_6', question: "מהי רמת מובהקות (אלפא)", options: ["ההסתברות שהשערת המחקר נכונה", "ההסתברות לדחות את השערת האפס כאשר היא נכונה (טעות מסוג I)", "ההסתברות לקבל את השערת האפס כאשר היא שגויה", "הציון הממוצע של המדגם"], correctAnswer: 1, explanation: "רמת מובהקות (אלפא) היא הסף שנקבע מראש לקבלת החלטה בבדיקת השערות. היא מייצגת את הסיכוי המקסימלי שאנו מוכנים לקחת לטעות מסוג I", topic: "בדיקת השערות", difficulty: "בינוני" },
+            { id: 'q6_7', question: "באיזה אזור בהתפלגות הדגימה נמצאים ערכי סטטיסטי המבחן שיובילו לדחיית השערת האפס", options: ["אזור הקבלה", "אזור הדחייה", "אזור המרכז", "אזור הממוצע"], correctAnswer: 1, explanation: "אזור הדחייה (Rejection Region) הוא טווח הערכים הקיצוניים של סטטיסטי המבחן, שאם הערך המחושב נופל בתוכו, אנו דוחים את השערת האפס", topic: "בדיקת השערות", difficulty: "קל" },
+
+            // שיעור 7: תהליך בדיקת השערות ב'
+            { id: 'q7_1', question: "חוקר ביצע מבחן סטטיסטי ודחה את השערת האפס (H0), למרות שבמציאות H0 נכונה. איזו טעות הוא ביצע", options: ["טעות מסוג I (אלפא)", "טעות מסוג II (בטא)", "טעות דגימה", "טעות מדידה"], correctAnswer: 0, explanation: "טעות מסוג I (אלפא) מתרחשת כאשר דוחים את השערת האפס (H0) למרות שהיא נכונה במציאות. זוהי טעות 'אזעקת שווא'", topic: "טעויות הסקה", difficulty: "בינוני" },
+            { id: 'q7_2', question: "מה ההבדל העיקרי בין השערה דו-זנבית (דו-צדדית) לחד-זנבית (חד-צדדית)", options: ["דו-זנבית בודקת הבדל בכל כיוון, חד-זנבית בודקת הבדל בכיוון ספציפי", "דו-זנבית דורשת מדגם גדול יותר מחד-זנבית", "חד-זנבית קלה יותר לחישוב מדו-זנבית", "אין הבדל מהותי, רק שמות שונים"], correctAnswer: 0, explanation: "השערה דו-זנבית בודקת האם קיים הבדל או קשר, ללא ציון כיוון (למשל, 'קיים הבדל'). השערה חד-זנבית מפרטת את כיוון ההבדל או הקשר (למשל, 'קבוצה א' גבוהה יותר מקבוצה ב'')", topic: "טעויות הסקה", difficulty: "קשה" },
+            { id: 'q7_3', question: "מהי טעות מסוג II (בטא)", options: ["דחיית השערת האפס כשהיא נכונה", "קבלת השערת האפס כשהיא שגויה", "אי-דחיית השערה אלטרנטיבית כשהיא נכונה", "בחירה שגויה של מבחן סטטיסטי"], correctAnswer: 1, explanation: "טעות מסוג II (בטא) מתרחשת כאשר מקבלים (או לא דוחים) את השערת האפס (H0) למרות שהיא שגויה במציאות. זוהי טעות 'החמצה'", topic: "טעויות הסקה", difficulty: "בינוני" },
+            { id: 'q7_4', question: "מהי עוצמה סטטיסטית (Power)", options: ["ההסתברות לטעות מסוג I", "ההסתברות לטעות מסוג II", "ההסתברות לדחות את השערת האפס כשהיא אכן שגויה", "ההסתברות לקבל את השערת האפס כשהיא נכונה"], correctAnswer: 2, explanation: "עוצמה סטטיסטית היא ההסתברות של מבחן סטטיסטי לדחות נכונה את השערת האפס כאשר היא אכן שגויה במציאות (כלומר, 1 מינוס בטא)", topic: "טעויות הסקה", difficulty: "קשה מאוד" },
+            { id: 'q7_5', question: "אם P-value קטן מ-0.05, איזו החלטה סטטיסטית נקבל", options: ["נקבל את השערת האפס", "נדחה את השערת האפס", "נבצע מבחן נוסף", "התוצאות אינן מובהקות"], correctAnswer: 1, explanation: "כאשר P-value קטן מרמת המובהקות (אלפא, למשל 0.05), זה מצביע על כך שהסיכוי שהתוצאות מקריות הוא נמוך מאוד, ולכן אנו דוחים את השערת האפס לטובת השערה אלטרנטיבית", topic: "טעויות הסקה", difficulty: "קל" },
+            { id: 'q7_6', question: "אם רמת המובהקות (אלפא) נקבעה ל-0.01, מהי ההסתברות המקסימלית לטעות מסוג I", options: ["1%", "5%", "10%", "99%"], correctAnswer: 0, explanation: "רמת המובהקות (אלפא) היא ההסתברות המקסימלית שאנו מוכנים לקחת לביצוע טעות מסוג I. אם אלפא היא 0.01, הסיכוי לטעות מסוג I הוא 1%", topic: "טעויות הסקה", difficulty: "בינוני" },
+            { id: 'q7_7', question: "כיצד עלייה ברמת הביטחון (Confidence Level) משפיעה על רוחב רווח בר-סמך", options: ["הרוחב מצטמצם", "הרוחב גדל", "אין שינוי ברוחב", "הרוחב הופך שווה לטעות התקן"], correctAnswer: 1, explanation: "כדי להיות בטוחים יותר (למשל 99% במקום 95%) שהפרמטר האמיתי נמצא בטווח, עלינו להרחיב את טווח הרווח", topic: "טעויות הסקה", difficulty: "קשה" },
+
+            // שיעור 8: מבחן T
+            { id: 'q8_1', question: "מתי נשתמש במבחן T לבלתי תלויים", options: ["כאשר אנו רוצים להשוות ממוצעים של שתי קבוצות שונות ובלתי קשורות זו לזו", "כאשר אנו רוצים להשוות ממוצעים של אותה קבוצה לפני ואחרי התערבות", "כאשר סטיית התקן של האוכלוסייה ידועה", "כאשר אנו רוצים לבחון קשר בין שני משתנים איכותיים"], correctAnswer: 0, explanation: "מבחן T לבלתי תלויים משמש להשוואת ממוצעים בין שתי קבוצות שונות ועצמאיות זו מזו (למשל, גברים מול נשים, קבוצת ניסוי מול קבוצת ביקורת)", topic: "מבחן T", difficulty: "בינוני" },
+            { id: 'q8_2', question: "מהו ההבדל העיקרי בין מבחן Z למבחן T", options: ["מבחן Z משמש למשתנים איכותיים, מבחן T לכמותיים", "מבחן Z משמש כאשר סטיית התקן של האוכלוסייה ידועה, מבחן T כאשר היא אינה ידועה ונאמדת מהמדגם", "מבחן T תמיד דורש מדגם גדול יותר ממבחן Z", "מבחן Z הוא תמיד חד-זנבי, מבחן T תמיד דו-זנבי"], correctAnswer: 1, explanation: "ההבדל העיקרי הוא שבעוד שמבחן Z דורש ידיעה על סטיית התקן של האוכלוסייה, מבחן T משמש כאשר סטיית התקן של האוכלוסייה אינה ידועה, ואנו משתמשים באומדן שלה מתוך סטיית התקן של המדגם", topic: "מבחן T", difficulty: "קשה" },
+            { id: 'q8_3', question: "באיזה מקרה נשתמש במבחן T למזווגים", options: ["כאשר אנו רוצים להשוות את ממוצעי הציונים של שתי קבוצות שונות של סטודנטים", "כאשר אנו רוצים לבדוק האם ממוצע הציונים של קבוצת סטודנטים השתנה לאחר קורס הכנה", "כאשר אנו רוצים לבחון האם יש קשר בין מספר שעות לימוד לציון במבחן", "כאשר סטיית התקן של האוכלוסייה ידועה ואנו בודקים ממוצע יחיד"], correctAnswer: 1, explanation: "מבחן T למזווגים (Paired Samples T-test) משמש להשוואת ממוצעים של אותה קבוצת נבדקים בשני מצבים שונים (לדוגמה, לפני ואחרי התערבות, או בשני תנאים שונים), או להשוואת ממוצעים בין זוגות תלויים", topic: "מבחן T", difficulty: "קשה" },
+            { id: 'q8_4', question: "מתי נשתמש במבחן T למדגם יחיד (One-Sample T-test)", options: ["כאשר רוצים להשוות ממוצע של מדגם בודד לערך ידוע באוכלוסייה, וסטיית התקן של האוכלוסייה אינה ידועה", "כאשר רוצים להשוות ממוצעים של שתי קבוצות בלתי תלויות", "כאשר רוצים להשוות ממוצעים של אותה קבוצה בשני זמנים שונים", "כאשר סטיית התקן של האוכלוסייה ידועה"], correctAnswer: 0, explanation: "מבחן T למדגם יחיד משמש לבדיקת השערות על ממוצע אוכלוסייה כאשר סטיית התקן של האוכלוסייה אינה ידועה, ויש לנו מדגם בודד", topic: "מבחן T", difficulty: "בינוני" },
+            { id: 'q8_5', question: "מהן 'דרגות חופש' (Degrees of Freedom) במבחן T", options: ["מספר המשתנים במחקר", "מספר התצפיות הכולל במדגם", "מספר התצפיות החופשיות להשתנות לאחר הטלת אילוצים מסוימים", "מספר הקבוצות הנבדקות"], correctAnswer: 2, explanation: "דרגות חופש מתייחסות למספר התצפיות הבלתי תלויות במערך נתונים, כלומר, מספר הערכים שיכולים להשתנות בחופשיות לאחר שהוטלו אילוצים מסוימים (למשל, חישוב ממוצע)", topic: "מבחן T", difficulty: "קשה" },
+            { id: 'q8_6', question: "איזה מבחן T מתאים להשוואת ממוצע ציונים של אותם סטודנטים לפני ואחרי קורס הכנה", options: ["מבחן T למדגם יחיד", "מבחן T לבלתי תלויים", "מבחן T למזווגים", "מבחן T דו-זנבי"], correctAnswer: 2, explanation: "מבחן T למזווגים (Paired Samples T-test) משמש להשוואת ממוצעים של אותה קבוצת נבדקים בשני מצבים שונים או להשוואת ממוצעים בין זוגות תלויים", topic: "מבחן T", difficulty: "בינוני" },
+            { id: 'q8_7', question: "מהי ההנחה העיקרית במבחן T לבלתי תלויים לגבי שונות האוכלוסיות", options: ["שונות האוכלוסיות חייבת להיות שונה באופן מובהק", "שונות האוכלוסיות חייבת להיות זהה (הומוגניות שונויות)", "אין חשיבות לשונות האוכלוסיות", "רק שונות המדגמים חשובה"], correctAnswer: 1, explanation: "אחת ההנחות המרכזיות במבחן T לבלתי תלויים היא הומוגניות שונויות, כלומר ששונות האוכלוסיות שמהן נלקחו המדגמים שווה. קיימות גרסאות של המבחן שאינן מניחות זאת (כמו מבחן וולש)", topic: "מבחן T", difficulty: "קשה מאוד" },
+            { id: 'q8_8', question: "מהי ההנחה לגבי התפלגות הנתונים במבחני T (לפחות בגרסתם הקלאסית)", options: ["הנתונים חייבים להתפלג באופן אחיד", "הנתונים חייבים להתפלג נורמלית", "הנתונים חייבים להיות בעלי שונות שונה", "אין חשיבות להתפלגות הנתונים"], correctAnswer: 1, explanation: "הנחה מרכזית במבחני T היא שהנתונים באוכלוסייה מתפלגים נורמלית. עם זאת, מבחני T נחשבים רובסטיים יחסית להפרה של הנחה זו במדגמים גדולים", topic: "מבחן T", difficulty: "קשה" },
+            { id: 'q8_9', question: "מה קורה לדרגות החופש במבחן T למזווגים, בהשוואה למבחן T לבלתי תלויים (עבור N שווה)", options: ["דרגות החופש גבוהות יותר במזווגים", "דרגות החופש זהות", "דרגות החופש נמוכות יותר במזווגים", "דרגות החופש אינן רלוונטיות למזווגים"], correctAnswer: 2, explanation: "דרגות החופש במבחן T למזווגים הן N-1 (כאשר N הוא מספר הזוגות), בעוד שבמבחן T לבלתי תלויים הן N1+N2-2. לכן, עבור גודל מדגם כולל זהה, דרגות החופש במזווגים נמוכות יותר", topic: "מבחן T", difficulty: "קשה מאוד" },
+
+            // שיעור 9: קשר בין משתנים
+            { id: 'q9_1', question: "איזה מבין הבאים מתאר קשר חיובי חזק בין שני משתנים", options: ["ככל שערך משתנה אחד עולה, ערך המשתנה השני יורד באופן עקבי", "אין קשר ברור בין המשתנים", "ככל שערך משתנה אחד עולה, ערך המשתנה השני נוטה לעלות באופן עקבי", "הקשר בין המשתנים הוא בצורת U הפוכה"], correctAnswer: 2, explanation: "קשר חיובי חזק פירושו שכאשר ערך משתנה אחד עולה, גם ערך המשתנה השני נוטה לעלות. 'חזק' מתייחס לעקביות ולחוזק הקשר", topic: "קשר בין משתנים", difficulty: "קל" },
+            { id: 'q9_2', question: "מקדם פירסון (r) שווה ל-0.9. מה ניתן להסיק מכך", options: ["קיים קשר שלילי חזק בין המשתנים", "אין קשר ליניארי בין המשתנים", "קיים קשר חיובי חזק מאוד בין המשתנים", "קיים קשר חיובי חלש בין המשתנים"], correctAnswer: 2, explanation: "מקדם פירסון נע בין -1 ל-1. ערך קרוב ל-1 (כמו 0.9) מצביע על קשר ליניארי חיובי חזק מאוד", topic: "קשר בין משתנים", difficulty: "בינוני" },
+            { id: 'q9_3', question: "מהי המטרה העיקרית של שימוש בדיאגרמת פיזור", options: ["להציג את התפלגות השכיחויות של משתנה בודד", "להשוות ממוצעים בין קבוצות שונות", "לבחון ויזואלית את הקשר בין שני משתנים כמותיים", "להציג את החציון והרביעים של משתנה"], correctAnswer: 2, explanation: "דיאגרמת פיזור (Scatter Plot) משמשת להצגה ויזואלית של הקשר בין שני משתנים כמותיים, ומאפשרת לזהות את כיוון הקשר, עוצמתו וצורתו", topic: "קשר בין משתנים", difficulty: "קל" },
+            { id: 'q9_4', question: "איזה סוג של קשר מתואר על ידי מקדם פירסון שלילי", options: ["ככל שמשתנה אחד עולה, המשתנה השני עולה גם כן", "אין קשר ליניארי בין המשתנים", "ככל שמשתנה אחד עולה, המשתנה השני יורד", "קשר לא ליניארי"], correctAnswer: 2, explanation: "מקדם פירסון שלילי (בין 0 ל-1-) מצביע על קשר הפוך: ככל שערך משתנה אחד עולה, ערך המשתנה השני נוטה לרדת", topic: "קשר בין משתנים", difficulty: "קל" },
+            { id: 'q9_5', question: "מהי טבלת צילוב (Contingency Table)", options: ["טבלה המציגה את הקשר בין שני משתנים כמותיים", "טבלה המציגה את התפלגות השכיחויות של משתנה בודד", "טבלה המציגה את הקשר בין שני משתנים איכותיים או סדרים", "טבלה המשמשת לחישוב ממוצעים"], correctAnswer: 2, explanation: "טבלת צילוב משמשת להצגת הקשר בין שני משתנים קטגוריאליים (שמיים או סדרים), על ידי הצגת השכיחויות המשותפות של צירופי הקטגוריות", topic: "קשר בין משתנים", difficulty: "בינוני" },
+            { id: 'q9_6', question: "מה מצביע מקדם פירסון השווה ל-0", options: ["קשר חיובי מושלם", "קשר שלילי מושלם", "אין קשר ליניארי בין המשתנים", "קשר חזק מאוד"], correctAnswer: 2, explanation: "מקדם פירסון השווה ל-0 מצביע על כך שאין קשר ליניארי בין שני המשתנים. ייתכן שקיים קשר לא ליניארי", topic: "קשר בין משתנים", difficulty: "בינוני" },
+            { id: 'q9_7', question: "איזה מבין הבאים אינו מאפיין של קשר סטטיסטי", options: ["כיוון", "עוצמה", "צורה", "מובהקות"], correctAnswer: 3, explanation: "מובהקות היא היבט של בדיקת השערות, לא מאפיין ישיר של הקשר הסטטיסטי עצמו (כמו כיוון, עוצמה וצורה)", topic: "קשר בין משתנים", difficulty: "קשה" },
+            { id: 'q9_8', question: "דיאגרמת פיזור מציגה נקודות המתפזרות בצורה אקראית ללא כל דפוס. מה ניתן להסיק מכך", options: ["קיים קשר חיובי חזק", "קיים קשר שלילי חזק", "אין קשר ליניארי ברור", "קיים קשר לא ליניארי חזק"], correctAnswer: 2, explanation: "פיזור אקראי של נקודות בדיאגרמת פיזור מצביע על היעדר קשר ליניארי ברור בין המשתנים", topic: "קשר בין משתנים", difficulty: "קל" },
+            { id: 'q9_9', question: "מקדם פירסון מתאים למדידת קשר בין אילו סוגי משתנים", options: ["שני משתנים איכותיים", "שני משתנים סדרים", "שני משתנים כמותיים", "משתנה איכותי ומשתנה כמותי"], correctAnswer: 2, explanation: "מקדם פירסון (r) משמש למדידת עוצמת וכיוון הקשר הליניארי בין שני משתנים כמותיים (רווח או מנה)", topic: "קשר בין משתנים", difficulty: "בינוני" }
+        ];
+
+        // אלמנטים מה-DOM
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const startQuizButton = document.getElementById('start-quiz-button');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const questionDisplay = document.getElementById('question-display');
+        const difficultyDisplay = document.getElementById('difficulty-display');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackDisplay = document.getElementById('feedback-display');
+        const nextButton = document.getElementById('next-button');
+        const skipButton = document.getElementById('skip-button'); // כפתור דלג
+        const replaceButton = document.getElementById('replace-button');
+        const progressDisplay = document.getElementById('progress-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-button');
+        const learningMeterFill = document.getElementById('learning-meter-fill');
+        const learningMeterText = document.getElementById('learning-meter-text');
+        const finalLearningMeterText = document.getElementById('final-learning-meter-text');
+        const currentStreakDisplay = document.getElementById('current-streak');
+        const bonusPopupContainer = document.getElementById('bonus-popup-container');
+        const verbalAssessmentDisplay = document.getElementById('verbal-assessment');
+        const resultsTitle = document.getElementById('results-title');
+
+        let selectedQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answeredCurrentQuestion = false;
+        let correctlyAnsweredUniqueQuestions = new Set();
+        let currentStreak = 0;
+        
+        // הגדרת רמות הבונוס וההודעות
+        const streakBonusLevels = {
+            3: "בונוס רצף קטן! (+1 נקודה)",
+            5: "רצף אדיר! (+1 נקודה)",
+            10: "מאסטר סטטיסטיקה! (+1 נקודה)"
+        };
+
+        // פונקציה לבחירת ההערכה המילולית לפי ציון (מעודכן)
+        function getVerbalAssessment(scorePercentage) {
+            if (scorePercentage === 100) {
+                return "ציון מושלם! שליטה מוחלטת בחומר. מוכנות מלאה למבחן! 🎉";
+            } else if (scorePercentage >= 90) {
+                return "מצוין! ההבנה שלך מעמיקה ויסודית. אתה/את בדרך הנכונה לציון גבוה.";
+            } else if (scorePercentage >= 75) {
+                return "טוב מאוד! רמת ידע גבוהה. נסה/י להתמקד בנושאים שבהם טעית כדי להגיע לשלמות.";
+            } else if (scorePercentage >= 50) {
+                return "עובר/ת! הבסיס קיים, אך יש מקום לחיזוק משמעותי. חזור/חזרי על ההסברים ותרגל/י שוב.";
+            } else if (scorePercentage >= 20) {
+                return "התחלה טובה! התרגול הראה שיש נושאים שדורשים חזרה יסודית. המשיכו לתרגל!";
+            } else {
+                return "כל הכבוד על המאמץ! התרגול הוא הצעד הראשון. אל תתייאש/י – עכשיו אתה/את יודע/ת בדיוק מה צריך לשנן. נסה/י שוב!";
+            }
+        }
+
+        // פונקציה להצגת חלון קופץ של בונוס
+        function showBonusPopup(message) {
+            const popup = document.createElement('div');
+            popup.className = 'streak-bonus-popup';
+            popup.textContent = message;
+            bonusPopupContainer.appendChild(popup);
+            
+            setTimeout(() => {
+                if(bonusPopupContainer.contains(popup)) {
+                    bonusPopupContainer.removeChild(popup);
+                }
+            }, 2500);
+        }
+
+        // פונקציה לניקוי נקודות בסוף השאלות
+        function cleanQuestionText() {
+            allQuestions.forEach(q => {
+                if (q.question.endsWith('.')) q.question = q.question.slice(0, -1);
+                if (q.explanation.endsWith('.')) q.explanation = q.explanation.slice(0, -1);
+            });
+        }
+
+        // פונקציה לבחירת 20 שאלות אקראיות מתוך המאגר
+        function selectRandomQuestions() {
+            const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, 20);
+        }
+
+        // פונקציה לעדכון מד הלמידה
+        function updateLearningMeter() {
+            const totalUniqueQuestions = allQuestions.length;
+            const answeredCorrectlyCount = correctlyAnsweredUniqueQuestions.size;
+            const percentage = (answeredCorrectlyCount / totalUniqueQuestions) * 100;
+            learningMeterFill.style.width = `${percentage.toFixed(0)}%`;
+            learningMeterText.textContent = `מד למידה: ${percentage.toFixed(0)}% (${answeredCorrectlyCount}/${totalUniqueQuestions})`;
+        }
+
+        // פונקציה לעדכון מד הרצף
+        function updateStreakDisplay() {
+            currentStreakDisplay.textContent = currentStreak;
+            const meterElement = document.getElementById('streak-meter');
+
+            // עדכון צבע הרצף בהתאם לרמה
+            if (currentStreak >= 5) {
+                 meterElement.style.backgroundColor = '#d1fae5';
+                 meterElement.style.color = '#059669';
+                 meterElement.style.border = '2px solid #059669';
+            } else if (currentStreak >= 3) {
+                meterElement.style.backgroundColor = '#fffbeb';
+                meterElement.style.color = '#c05621';
+                meterElement.style.border = '1px solid #c05621';
+            } else {
+                meterElement.style.backgroundColor = '#f7f3ff';
+                meterElement.style.color = '#6b46c1';
+                meterElement.style.border = '1px solid #d6bcfa';
+            }
+        }
+
+        // פונקציה להצגת השאלה הנוכחית
+        function displayQuestion() {
+            quizScreen.classList.remove('hidden');
+            welcomeScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            feedbackDisplay.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            
+            // כפתורי הפעולה מופעלים מחדש
+            replaceButton.disabled = false;
+            skipButton.disabled = false;
+            
+            answeredCurrentQuestion = false;
+
+            const question = selectedQuestions[currentQuestionIndex];
+            questionDisplay.textContent = question.question;
+            
+            // 1. הסרת כל מחלקות הצבע הקודמות
+            difficultyDisplay.className = 'difficulty-text mb-4';
+
+            // 2. החלת מחלקת הצבע המתאימה
+            const difficultyClassMap = {
+                "קל": "difficulty-easy",
+                "בינוני": "difficulty-medium",
+                "קשה": "difficulty-hard",
+                "קשה מאוד": "difficulty-very-hard",
+            };
+            const difficultyKey = question.difficulty.trim();
+            const newClass = difficultyClassMap[difficultyKey];
+            
+            difficultyDisplay.textContent = `קושי: ${question.difficulty}`;
+            if (newClass) {
+                difficultyDisplay.classList.add(newClass);
+            }
+            
+            optionsContainer.innerHTML = '';
+            progressDisplay.textContent = `שאלה ${currentQuestionIndex + 1} מתוך ${selectedQuestions.length}`;
+            updateStreakDisplay();
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-button');
+                button.dataset.index = index;
+                button.addEventListener('click', () => checkAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // פונקציה לבדיקת התשובה שנבחרה
+        function checkAnswer(selectedIndex) {
+            if (answeredCurrentQuestion) return;
+
+            answeredCurrentQuestion = true;
+            replaceButton.disabled = true;
+            skipButton.disabled = true; // מנטרל את כפתור הדלג
+            const question = selectedQuestions[currentQuestionIndex];
+            const optionButtons = optionsContainer.querySelectorAll('.option-button');
+
+            optionButtons.forEach((button, index) => {
+                button.disabled = true;
+                if (index === question.correctAnswer) {
+                    button.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    button.classList.add('incorrect');
+                }
+            });
+
+            if (selectedIndex === question.correctAnswer) {
+                score++;
+                currentStreak++;
+                
+                if (streakBonusLevels[currentStreak]) {
+                    score += 1; // נקודת בונוס
+                    showBonusPopup(streakBonusLevels[currentStreak]);
+                }
+                
+                if (!correctlyAnsweredUniqueQuestions.has(question.id)) {
+                    correctlyAnsweredUniqueQuestions.add(question.id);
+                    updateLearningMeter();
+                }
+                feedbackDisplay.innerHTML = `<strong>תשובה נכונה!</strong><br>${question.explanation}`;
+            } else {
+                currentStreak = 0;
+                feedbackDisplay.innerHTML = `<strong>תשובה שגויה.</strong> התשובה הנכונה הייתה: "${question.options[question.correctAnswer]}".<br>${question.explanation}`;
+            }
+
+            updateStreakDisplay();
+            feedbackDisplay.classList.remove('hidden');
+            nextButton.classList.remove('hidden');
+        }
+
+        // פונקציה למעבר לשאלה הבאה או להצגת התוצאות הסופיות
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < selectedQuestions.length) {
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        // פונקציית דלג
+        function skipQuestion() {
+            if (answeredCurrentQuestion) return;
+            
+            // מנטרל כפתורים
+            answeredCurrentQuestion = true;
+            currentStreak = 0; // דלג מאפס את הרצף
+            replaceButton.disabled = true;
+            skipButton.disabled = true;
+            
+            // מציג הודעה קצרה על הדילוג
+            feedbackDisplay.innerHTML = `<strong>דילגת על שאלה זו.</strong> כדי ללמוד ממנה, בדוק/בדקי את ההסבר המלא: <br>${selectedQuestions[currentQuestionIndex].explanation}`;
+            
+            // מציג את ההסבר ומוכן למעבר
+            feedbackDisplay.classList.remove('hidden');
+            nextButton.classList.remove('hidden');
+            
+            updateStreakDisplay();
+        }
+
+        // פונקציה להחלפת השאלה הנוכחית
+        function replaceCurrentQuestion() {
+            if (answeredCurrentQuestion) return;
+
+            let newQuestion = null;
+            let attempts = 0;
+            const maxAttempts = allQuestions.length * 5; 
+
+            while (newQuestion === null && attempts < maxAttempts) {
+                const randomIndex = Math.floor(Math.random() * allQuestions.length);
+                const potentialNewQuestion = allQuestions[randomIndex];
+
+                const isAlreadyInSelected = selectedQuestions.some(q => q.id === potentialNewQuestion.id);
+
+                if (!isAlreadyInSelected) {
+                    newQuestion = potentialNewQuestion;
+                }
+                attempts++;
+            }
+
+            if (newQuestion) {
+                selectedQuestions[currentQuestionIndex] = newQuestion;
+                displayQuestion();
+            } else {
+                feedbackDisplay.innerHTML = `<strong>אין שאלות נוספות ייחודיות להחלפה כרגע.</strong>`;
+                feedbackDisplay.classList.remove('hidden');
+            }
+        }
+
+
+        // פונקציה להצגת תוצאות המבחן הסופיות
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            const totalQuestions = selectedQuestions.length;
+            const scorePercentage = (score / totalQuestions) * 100;
+            const finalScoreMessage = `קיבלת ${score} מתוך ${totalQuestions} שאלות נכונות. (${scorePercentage.toFixed(0)}%)`;
+            
+            finalScoreDisplay.textContent = finalScoreMessage;
+            
+            // הערכה מילולית
+            verbalAssessmentDisplay.textContent = getVerbalAssessment(scorePercentage);
+
+            // עדכון מד למידה במסך הסיום
+            finalLearningMeterText.textContent = `מד למידה כולל: ${correctlyAnsweredUniqueQuestions.size} מתוך ${allQuestions.length} שאלות ייחודיות (${((correctlyAnsweredUniqueQuestions.size / allQuestions.length) * 100).toFixed(0)}%)`;
+            
+            // כותרת מסך הסיום ניטרלית
+            resultsTitle.textContent = "סיום המבחן";
+        }
+
+        // פונקציה לאתחול המבחן מחדש
+        function initializeQuiz() {
+            selectRandomQuestions();
+            currentQuestionIndex = 0;
+            score = 0;
+            currentStreak = 0;
+            displayQuestion();
+            updateLearningMeter();
+            updateStreakDisplay();
+        }
+
+        // פונקציה שמפעילה את המבחן מהכפתור במסך הפתיחה
+        function startQuiz() {
+            initializeQuiz();
+        }
+
+        // אירועי לחיצה על כפתורים
+        startQuizButton.addEventListener('click', startQuiz);
+        nextButton.addEventListener('click', nextQuestion);
+        skipButton.addEventListener('click', skipQuestion); // לחיצה על דלג
+        replaceButton.addEventListener('click', replaceCurrentQuestion);
+        restartButton.addEventListener('click', initializeQuiz);
+
+        // אתחול ראשוני - ניקוי ורק הצגת מסך הפתיחה
+        document.addEventListener('DOMContentLoaded', () => {
+            cleanQuestionText();
+            welcomeScreen.classList.remove('hidden');
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            updateLearningMeter(); 
+        });
+    </script>
+</body>
+</html>
