@@ -1,0 +1,5 @@
+this is a quiz app for students to learn to exams
+1. create an easy development environment that can easily be deployed
+2. decide on good project heirarchy that can be maintained easily
+3. create a simple implemnatation according to the POC with the new structure (js files, index html, css)
+4. make project reaady for deployment 
